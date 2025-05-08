@@ -19,13 +19,8 @@ public class CounterView : MonoBehaviour
     {
         _counter.ValueChanged -= OnValueChanged;
     }
-
-    private void OnValueChanged(int value)
-    {
-        DisplayValue(value);
-    }
     
-    private void DisplayValue(int value)
+    private void OnValueChanged(int value)
     {
         Debug.Log(value);
     }

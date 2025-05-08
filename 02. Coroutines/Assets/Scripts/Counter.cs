@@ -5,17 +5,19 @@ using UnityEngine;
 [RequireComponent(typeof(InputReceiver))]
 public class Counter : MonoBehaviour
 {
-    [SerializeField] private float _changeInterval = 0.5f;
-    
-    public event Action<int> ValueChanged;
+    private const float ChangeInterval = 0.5f;
     
     private InputReceiver _receiver;
-    private Coroutine _valueChanger = null;
-    private int _value = 0;
+    private Coroutine _valueChanger;
+    private WaitForSeconds _timeWait;
+    private int _value;
+    
+    public event Action<int> ValueChanged;
     
     private void Awake()
     {
         _receiver = GetComponent<InputReceiver>();
+        _timeWait = new WaitForSeconds(ChangeInterval);
     }
     
     private void OnEnable()
@@ -30,36 +32,22 @@ public class Counter : MonoBehaviour
     
     private void OnMouseButtonPressed()
     {
-        ToggleTimer();
-    }
-    
-    private void ToggleTimer()
-    {
-        if (_valueChanger == null)
-            EnableTimer();
-        else
-            DisableTimer();
-    }
-    
-    private void EnableTimer()
-    {
+        if (_valueChanger != null)
+        {
+            StopCoroutine(_valueChanger);
+            _valueChanger = null;
+            return;
+        }
+        
         _valueChanger = StartCoroutine(IncreaseValue());
-    }
-
-    private void DisableTimer()
-    {
-        StopCoroutine(_valueChanger);
-        _valueChanger = null;
     }
     
     private IEnumerator IncreaseValue()
     {
-        var timeWait = new WaitForSeconds(_changeInterval);
-        
-        while (true)
+        while (enabled)
         {
-            ValueChanged?.Invoke(_value++);
-            yield return timeWait;
+            ValueChanged?.Invoke(++_value);
+            yield return _timeWait;
         }
     }
 }
