@@ -1,39 +1,65 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(InputReceiver))]
 public class Counter : MonoBehaviour
 {
-    [SerializeField] private float _interval = 0.5f;
+    [SerializeField] private float _changeInterval = 0.5f;
     
-    private const int MouseButtonLeft = 0;
+    public event Action<int> ValueChanged;
     
-    private int _value = 0;
+    private InputReceiver _receiver;
     private Coroutine _valueChanger = null;
+    private int _value = 0;
     
-    private void Update()
+    private void Awake()
     {
-        if (Input.GetMouseButtonDown(MouseButtonLeft))
-            OnLeftMouseButtonDown();
+        _receiver = GetComponent<InputReceiver>();
     }
     
-    private void OnLeftMouseButtonDown()
+    private void OnEnable()
     {
-        if (_valueChanger != null)
-        {
-            StopCoroutine(_valueChanger);
-            _valueChanger = null;
-            return;
-        }
+        _receiver.MouseButtonPressed += OnMouseButtonPressed;
+    }
+    
+    private void OnDisable()
+    {
+        _receiver.MouseButtonPressed -= OnMouseButtonPressed;
+    }
+    
+    private void OnMouseButtonPressed()
+    {
+        ToggleTimer();
+    }
+    
+    private void ToggleTimer()
+    {
+        if (_valueChanger == null)
+            EnableTimer();
+        else
+            DisableTimer();
+    }
+    
+    private void EnableTimer()
+    {
+        _valueChanger = StartCoroutine(IncreaseValue());
+    }
+
+    private void DisableTimer()
+    {
+        StopCoroutine(_valueChanger);
+        _valueChanger = null;
+    }
+    
+    private IEnumerator IncreaseValue()
+    {
+        var timeWait = new WaitForSeconds(_changeInterval);
         
-        _valueChanger = StartCoroutine(DisplayCounter());
-    }
-    
-    private IEnumerator DisplayCounter()
-    {
         while (true)
         {
-            Debug.Log($"Value: {_value++}");
-            yield return new WaitForSeconds(_interval);
+            ValueChanged?.Invoke(_value++);
+            yield return timeWait;
         }
     }
 }
