@@ -1,14 +1,26 @@
+using System;
 using UnityEngine;
 
+[RequireComponent(typeof(InputReceiver))]
 public class Gun : MonoBehaviour
 {
     private Camera _mainCamera;
+    private InputReceiver _receiver;
     
-    private void Start()
+    private void Awake()
     {
         _mainCamera = Camera.main;
-        
-        GetComponent<InputReceiver>().MouseButtonPressed += Fire;
+        _receiver = GetComponent<InputReceiver>();
+    }
+    
+    private void OnEnable()
+    {
+        _receiver.MouseButtonPressed += Fire;
+    }
+    
+    private void OnDisable()
+    {
+        _receiver.MouseButtonPressed -= Fire;
     }
     
     private void Fire()
