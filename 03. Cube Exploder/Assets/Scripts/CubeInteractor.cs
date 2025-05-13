@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Spawner), typeof(Raycaster), typeof(Exploder))]
-public class CubeController : MonoBehaviour
+public class CubeInteractor : MonoBehaviour
 {
     private Spawner _spawner;
     private Raycaster _raycaster;

@@ -32,7 +32,7 @@ public class Raycaster : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit) == false)
             return;
         
-        if (hit.collider.gameObject.TryGetComponent<Cube>(out var cube))
+        if (hit.collider.gameObject.TryGetComponent(out Cube cube))
             Touched?.Invoke(cube);
     }
 }

@@ -5,45 +5,34 @@ public class Spawner : MonoBehaviour
 {
     [SerializeField] private Cube _prefab;
     
-    private Vector3[] LocalSpawnPositions = {
-        new (-0.25f, -0.25f, -0.25f),
-        new (-0.25f, -0.25f,  0.25f),
-        new (-0.25f,  0.25f, -0.25f),
-        new (-0.25f,  0.25f,  0.25f),
-        new ( 0.25f, -0.25f, -0.25f),
-        new ( 0.25f, -0.25f,  0.25f),
-        new ( 0.25f,  0.25f, -0.25f),
-        new ( 0.25f,  0.25f,  0.25f),
-    }; 
+    private Vector3[] _localSpawnPositions; 
     
     public event Action<Cube, Vector3> Spawned;
     
     private void Start()
     {
-        Spawn(
-            new Vector3(0.0f, 1.0f, 0.0f), 
-            Quaternion.Euler(0, 45.0f, 0), 
-            1.0f, 
-            new Vector3(2.0f, 2.0f, 2.0f)
-        );
+        _localSpawnPositions = InitLocalPositions();
+        
+        SpawnInitialCubes();
     }
     
-    private void OnTouched(Cube cube)
+    private void OnInteracted(Cube cube)
+    {
+        Despawn(cube);
+    }
+
+    private void OnInteractedWithSplit(Cube cube)
     {
         Transform sourceTransform = cube.gameObject.transform;
         Vector3 sourcePosition = sourceTransform.position;
         Quaternion sourceRotation = sourceTransform.rotation;
         Vector3 sourceScale = sourceTransform.localScale;
         float sourceProbability = cube.ExplodeProbability;
-
-        cube.Clicked -= OnTouched;
-        Destroy(cube.gameObject);
-
-        if (UnityEngine.Random.value > sourceProbability)
-            return;
+        
+        Despawn(cube);
         
         float divisor = 2.0f;
-        Vector3[] spawnPositions = GeneratePositions(cube.gameObject.transform);
+        Vector3[] spawnPositions = GeneratePositions(sourceTransform);
         
         foreach (var position in spawnPositions)
         {
@@ -57,28 +46,37 @@ public class Spawner : MonoBehaviour
     {
         Cube cube = Instantiate(_prefab, position, rotation);
         
-        cube.SetProperties(explodeProbability, scale, GetRandomColor());
-        cube.Clicked += OnTouched;
+        cube.Initialize(explodeProbability, scale, GetRandomColor());
+        cube.Interacted += OnInteracted;
+        cube.InteractedWithSplit += OnInteractedWithSplit;
         
         return cube;
+    }
+
+    private void Despawn(Cube cube)
+    {
+        cube.Interacted -= OnInteracted;
+        cube.InteractedWithSplit -= OnInteractedWithSplit;
+        
+        Destroy(cube.gameObject);
     }
 
     private Vector3[] GeneratePositions(Transform sourceTransform)
     {
         int minCount = 2;
         int maxCount = 6;
-        var indices = new int[LocalSpawnPositions.Length];
+        var indices = new int[_localSpawnPositions.Length];
         
-        for (int i = 0; i < LocalSpawnPositions.Length; i++)
+        for (int i = 0; i < _localSpawnPositions.Length; i++)
             indices[i] = i;
 
         Shuffle(indices);
         
-        int positionsCount = UnityEngine.Random.Range(minCount, maxCount);
+        int positionsCount = UnityEngine.Random.Range(minCount, maxCount + 1);
         var positions = new Vector3[positionsCount];
         
         for (int i = 0; i < positionsCount; i++)
-            positions[i] = sourceTransform.TransformPoint(LocalSpawnPositions[indices[i]]);
+            positions[i] = sourceTransform.TransformPoint(_localSpawnPositions[indices[i]]);
         
         return positions;
     }
@@ -97,5 +95,36 @@ public class Spawner : MonoBehaviour
     private Color GetRandomColor()
     {
         return Color.HSVToRGB(UnityEngine.Random.Range(0.0f, 1.0f), 0.32f, 0.86f);
+    }
+    
+    private void SpawnInitialCubes()
+    {
+        float initialScale = 2.0f;
+        float initialCenterHeight = initialScale / 2.0f;
+        float initialExplodeProbability = 1.0f;
+        
+        var spawnPosition = new Vector3(0.0f, initialCenterHeight, 0.0f);
+        var scale = Vector3.one * initialScale;
+        
+        Spawn(
+            spawnPosition,
+            Quaternion.Euler(0, 45.0f, 0),
+            initialExplodeProbability,
+            scale
+        );
+    }
+    
+    private Vector3[] InitLocalPositions()
+    {
+        return new Vector3[]{
+            new (-0.25f, -0.25f, -0.25f),
+            new (-0.25f, -0.25f,  0.25f),
+            new (-0.25f,  0.25f, -0.25f),
+            new (-0.25f,  0.25f,  0.25f),
+            new ( 0.25f, -0.25f, -0.25f),
+            new ( 0.25f, -0.25f,  0.25f),
+            new ( 0.25f,  0.25f, -0.25f),
+            new ( 0.25f,  0.25f,  0.25f),
+        };
     }
 }

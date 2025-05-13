@@ -3,11 +3,12 @@ using UnityEngine;
 
 public class Cube : MonoBehaviour
 {
-    public event Action<Cube> Clicked;
+    public event Action<Cube> Interacted;
+    public event Action<Cube> InteractedWithSplit;
     
     public float ExplodeProbability { get; private set; } = 1.0f;
 
-    public void SetProperties(float explodeProbability, Vector3 scale, Color color)
+    public void Initialize(float explodeProbability, Vector3 scale, Color color)
     {
         ExplodeProbability = explodeProbability;
         transform.localScale = scale;
@@ -16,6 +17,9 @@ public class Cube : MonoBehaviour
     
     public void Touch()
     {
-        Clicked?.Invoke(this);
+        if (UnityEngine.Random.value > ExplodeProbability)
+            Interacted?.Invoke(this);
+        else
+            InteractedWithSplit?.Invoke(this);
     }
 }
