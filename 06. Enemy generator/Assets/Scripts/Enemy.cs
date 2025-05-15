@@ -7,15 +7,15 @@ public class Enemy : MonoBehaviour
     private Vector3 _moveDirection;
     private bool _isMoving;
     
-    public void StartMove(Vector3 direction)
-    {
-        _moveDirection = direction;
-        _isMoving = true;
-    }
-    
     private void Update()
     {
         if (_isMoving)
             transform.Translate(_moveSpeed * Time.deltaTime * _moveDirection, Space.World);
+    }
+    
+    public void StartMove(Vector3 direction)
+    {
+        _moveDirection = direction;
+        _isMoving = true;
     }
 }

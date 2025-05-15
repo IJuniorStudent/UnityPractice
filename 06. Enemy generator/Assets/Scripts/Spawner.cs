@@ -24,6 +24,13 @@ public class Spawner : MonoBehaviour
         _timer.Ticked -= OnTicked;
     }
     
+    private void OnDrawGizmos()
+    {
+        if (_spawnPositions.Length > 0)
+            foreach (var point in _spawnPositions)
+                DrawPoint(point);
+    }
+    
     private void OnTicked()
     {
         DirectedPoint spawnPosition = _spawnPositions[Random.Range(0, _spawnPositions.Length)];
@@ -36,13 +43,6 @@ public class Spawner : MonoBehaviour
         Enemy enemy = Instantiate(_prefab, spawnPosition.Point, spawnPosition.GetRotation());
         
         enemy.StartMove(spawnPosition.Direction);
-    }
-    
-    private void OnDrawGizmos()
-    {
-        if (_spawnPositions.Length > 0)
-            foreach (var point in _spawnPositions)
-                DrawPoint(point);
     }
 
     private void DrawPoint(DirectedPoint point)
