@@ -2,22 +2,21 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 
+[RequireComponent(typeof(BoxArea))]
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private FirstCollisionDetector _prefab;
+    [SerializeField] private Cube _prefab;
     [SerializeField] private int _cubesCapacity = 10;
     [SerializeField] private int _cubesMaxCount = 20;
     
     private BoxArea _boxArea;
-    private ObjectPool<FirstCollisionDetector> _pool;
-    private float _releaseDelaySecondsMin = 2.0f;
-    private float _releaseDelaySecondsMax = 5.0f;
+    private ObjectPool<Cube> _pool;
     
     private void Awake()
     {
         _boxArea = GetComponent<BoxArea>();
         
-        _pool = new ObjectPool<FirstCollisionDetector>(
+        _pool = new ObjectPool<Cube>(
             createFunc: CreateCube,
             actionOnGet: ReuseCube,
             actionOnRelease: DisableCube,
@@ -30,38 +29,36 @@ public class Spawner : MonoBehaviour
 
     private void Start()
     {
-        for (int i = 0; i < _cubesCapacity; i++)
-            _pool.Get();
+        StartCoroutine(SpawnCubes(_cubesCapacity));
     }
     
-    private FirstCollisionDetector CreateCube()
+    private Cube CreateCube()
     {
-        FirstCollisionDetector cube = Instantiate(_prefab);
+        Cube cube = Instantiate(_prefab);
         RandomizeStartPosition(cube.gameObject.transform);
         
-        cube.Collided += OnCollided;
+        cube.LifetimeExpired += OnLifetimeExpired;
         
         return cube;
     }
     
-    private void DestroyCube(FirstCollisionDetector detector)
+    private void DestroyCube(Cube cube)
     {
-        detector.Collided -= OnCollided;
+        cube.LifetimeExpired -= OnLifetimeExpired;
         
-        Destroy(detector.gameObject);
+        Destroy(cube.gameObject);
     }
 
-    private void ReuseCube(FirstCollisionDetector detector)
+    private void ReuseCube(Cube detector)
     {
         RandomizeStartPosition(detector.gameObject.transform);
         
-        detector.gameObject.GetComponent<ColorRandomizer>().Randomize();
         detector.gameObject.SetActive(true);
     }
 
-    private void DisableCube(FirstCollisionDetector detector)
+    private void DisableCube(Cube cube)
     {
-        detector.gameObject.SetActive(false);
+        cube.gameObject.SetActive(false);
     }
 
     private void RandomizeStartPosition(Transform targetTransform)
@@ -70,20 +67,18 @@ public class Spawner : MonoBehaviour
         targetTransform.rotation = Quaternion.Euler(0, Random.Range(0, 360), Random.Range(0, 360));
     }
     
-    private void OnCollided(FirstCollisionDetector detector)
+    private void OnLifetimeExpired(Cube cube)
     {
-        detector.gameObject.GetComponent<ColorRandomizer>().Randomize();
-        
-        float releaseDelay = Random.Range(_releaseDelaySecondsMin, _releaseDelaySecondsMax);
-        
-        StartCoroutine(RespawnDelayed(detector, releaseDelay));
-    }
-
-    private IEnumerator RespawnDelayed(FirstCollisionDetector target, float delaySeconds)
-    {
-        yield return new WaitForSeconds(delaySeconds);
-        
-        _pool.Release(target);
+        _pool.Release(cube);
         _pool.Get();
+    }
+    
+    private IEnumerator SpawnCubes(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            _pool.Get();
+            yield return null;
+        }
     }
 }

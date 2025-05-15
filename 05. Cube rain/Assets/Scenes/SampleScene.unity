@@ -133,7 +133,6 @@ GameObject:
   - component: {fileID: 430457703}
   - component: {fileID: 430457702}
   - component: {fileID: 430457701}
-  - component: {fileID: 430457700}
   - component: {fileID: 430457699}
   - component: {fileID: 430457698}
   m_Layer: 0
@@ -176,24 +175,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62f26bc793386aa4291fb8fdfc4ea77d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &430457700
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 430457697}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ad590131e3d0cc4d9d6311966e77bc1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hueMin: 0.572
-  _hueMax: 0.572
-  _saturationMin: 0.05
-  _saturationMax: 0.05
-  _valueMin: 0.53
-  _valueMax: 0.53
 --- !u!23 &430457701
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -270,7 +251,6 @@ GameObject:
   - component: {fileID: 551704123}
   - component: {fileID: 551704122}
   - component: {fileID: 551704121}
-  - component: {fileID: 551704120}
   - component: {fileID: 551704119}
   - component: {fileID: 551704118}
   m_Layer: 0
@@ -313,24 +293,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62f26bc793386aa4291fb8fdfc4ea77d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &551704120
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 551704117}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ad590131e3d0cc4d9d6311966e77bc1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hueMin: 0.572
-  _hueMax: 0.572
-  _saturationMin: 0.05
-  _saturationMax: 0.05
-  _valueMin: 0.53
-  _valueMax: 0.53
 --- !u!23 &551704121
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -501,7 +463,6 @@ GameObject:
   - component: {fileID: 869686200}
   - component: {fileID: 869686199}
   - component: {fileID: 869686198}
-  - component: {fileID: 869686196}
   - component: {fileID: 869686201}
   - component: {fileID: 869686202}
   m_Layer: 0
@@ -511,24 +472,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &869686196
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 869686195}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ad590131e3d0cc4d9d6311966e77bc1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hueMin: 0.572
-  _hueMax: 0.572
-  _saturationMin: 0.05
-  _saturationMax: 0.05
-  _valueMin: 0.53
-  _valueMax: 0.53
 --- !u!23 &869686198
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -730,7 +673,6 @@ GameObject:
   - component: {fileID: 1765034439}
   - component: {fileID: 1765034438}
   - component: {fileID: 1765034437}
-  - component: {fileID: 1765034436}
   - component: {fileID: 1765034435}
   - component: {fileID: 1765034434}
   m_Layer: 0
@@ -773,24 +715,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62f26bc793386aa4291fb8fdfc4ea77d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1765034436
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1765034433}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ad590131e3d0cc4d9d6311966e77bc1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hueMin: 0.572
-  _hueMax: 0.572
-  _saturationMin: 0.05
-  _saturationMax: 0.05
-  _valueMin: 0.53
-  _valueMax: 0.53
 --- !u!23 &1765034437
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -916,7 +840,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 385d79cb6072beb4fa66d4f48c315348, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _prefab: {fileID: 7938019588835318254, guid: 745b35a726bc29140b489f7bba98c52a, type: 3}
+  _prefab: {fileID: 2697870326560196142, guid: 745b35a726bc29140b489f7bba98c52a, type: 3}
   _cubesCapacity: 10
   _cubesMaxCount: 15
 --- !u!1001 &7117144290537667074

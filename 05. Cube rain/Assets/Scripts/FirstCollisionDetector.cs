@@ -3,21 +3,21 @@ using UnityEngine;
 
 public class FirstCollisionDetector : MonoBehaviour
 {
-    public event Action<FirstCollisionDetector> Collided;
-
     private bool _hasCollided = false;
-
-    private void OnEnable()
-    {
-        _hasCollided = false;
-    }
-
+    
+    public event Action Collided;
+    
     private void OnCollisionEnter(Collision collision)
     {
         if (_hasCollided == false && collision.gameObject.TryGetComponent<CollisionTarget>(out _))
         {
             _hasCollided = true;
-            Collided?.Invoke(this);
+            Collided?.Invoke();
         }
+    }
+
+    public void Reset()
+    {
+        _hasCollided = false;
     }
 }
