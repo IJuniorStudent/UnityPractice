@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Timer))]
 public class SpawnDirector : MonoBehaviour
 {
-    private List<Spawner> _spawners = new ();
+    [SerializeField] private List<Spawner> _spawners;
     private Timer _timer;
     
     private void Awake()
@@ -20,11 +20,6 @@ public class SpawnDirector : MonoBehaviour
     private void OnDisable()
     {
         _timer.Ticked -= OnTicked;
-    }
-    
-    public void RegisterSpawner(Spawner spawner)
-    {
-        _spawners.Add(spawner);
     }
     
     private void OnTicked()

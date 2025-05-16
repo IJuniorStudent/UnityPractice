@@ -3,13 +3,12 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    private const float DistanceCheckThreshold = 0.1f;
+    private const float DistanceCheckThreshold = 1.0f;
     
     [SerializeField] private float _moveSpeed = 5.0f;
     
     private bool _isMoving = false;
-    private Vector3 _targetPosition;
-    private Vector3 _direction;
+    private Transform _target;
     
     public event Action<Enemy> DestinationReached;
     
@@ -25,19 +24,20 @@ public class Enemy : MonoBehaviour
             return;
         }
         
-        transform.Translate(_moveSpeed * Time.deltaTime * _direction, Space.World);
+        Vector3 direction = (_target.position - transform.position).normalized;
+        
+        transform.rotation = transform.position.VerticalLookAt(_target.position);
+        transform.Translate(_moveSpeed * Time.deltaTime * direction, Space.World);
     }
     
-    public void StartMove(Vector3 destination)
+    public void StartMove(Transform target)
     {
-        _targetPosition = destination;
-        _direction = (_targetPosition - transform.position).normalized;
-        
+        _target = target;
         _isMoving = true;
     }
     
     private bool IsDestinationReached()
     {
-        return (_targetPosition - transform.position).sqrMagnitude <= DistanceCheckThreshold;
+        return (_target.position - transform.position).sqrMagnitude <= DistanceCheckThreshold;
     }
 }

@@ -2,11 +2,10 @@ using System;
 using UnityEngine;
 using UnityEngine.Pool;
 
-[RequireComponent(typeof(SpawnDirector))]
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private Enemy _prefab;
-    [SerializeField] private Route _route;
+    [SerializeField] private Transform _target;
+    [SerializeField] private Enemy _enemyPrefab;
     [SerializeField] private int _enemyPoolCapacity = 10;
     [SerializeField] private int _enemyPoolMaxSize = 15;
     
@@ -14,23 +13,15 @@ public class Spawner : MonoBehaviour
     
     private void Awake()
     {
-        var director = GetComponent<SpawnDirector>();
-        director.RegisterSpawner(this);
-        
         _pool = new ObjectPool<Enemy>(
             createFunc: CreateEnemy,
             actionOnGet: ReuseEnemy,
-            actionOnRelease: ReleaseEnemy,
+            actionOnRelease: DespawnEnemy,
             actionOnDestroy: DestroyEnemy,
             collectionCheck: true,
             defaultCapacity: _enemyPoolCapacity,
             maxSize: _enemyPoolMaxSize
         );
-    }
-    
-    private void OnDrawGizmos()
-    {
-        _route.DebugDraw();
     }
     
     public void SpawnEnemy()
@@ -45,7 +36,7 @@ public class Spawner : MonoBehaviour
     
     private Enemy CreateEnemy()
     {
-        Enemy enemy = Instantiate(_prefab);
+        Enemy enemy = Instantiate(_enemyPrefab);
         
         enemy.DestinationReached += OnDestinationReached;
         ActivateEnemyMove(enemy);
@@ -60,7 +51,7 @@ public class Spawner : MonoBehaviour
         ActivateEnemyMove(enemy);
     }
     
-    private void ReleaseEnemy(Enemy enemy)
+    private void DespawnEnemy(Enemy enemy)
     {
         enemy.gameObject.SetActive(false);
     }
@@ -74,12 +65,14 @@ public class Spawner : MonoBehaviour
     private void ActivateEnemyMove(Enemy enemy)
     {
         SetInitialTransform(enemy.gameObject.transform);
-        enemy.StartMove(_route.Destination);
+        enemy.StartMove(_target);
     }
     
-    private void SetInitialTransform(Transform target)
+    private void SetInitialTransform(Transform enemyTransform)
     {
-        target.position = _route.Start;
-        target.rotation = _route.CalculateVerticalRotation();
+        Vector3 spawnPosition = gameObject.transform.position;
+        
+        enemyTransform.position = spawnPosition;
+        enemyTransform.rotation = spawnPosition.VerticalLookAt(_target.position);
     }
 }
