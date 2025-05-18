@@ -4,9 +4,9 @@ using UnityEngine.Pool;
 
 public class Shooter : MonoBehaviour
 {
-    [SerializeField] Projectile _projectile;
+    [SerializeField] private Projectile _projectile;
     [SerializeField] private float _projectileSpeed = 100.0f;
-    [SerializeField] float _shootInterval = 1.0f;
+    [SerializeField] private float _shootInterval = 1.0f;
     [SerializeField] private Transform _target;
     [SerializeField] private int _poolCapacity = 10;
     [SerializeField] private int _poolMaxSize = 100;
