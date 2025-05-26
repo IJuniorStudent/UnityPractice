@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(AlarmDetector))]
+[RequireComponent(typeof(AlarmDetector), typeof(AudioSource))]
 public class AlarmVisualizer : MonoBehaviour
 {
     [SerializeField, Min(0.1f)] private float _volumeChangeTime = 2.0f;
