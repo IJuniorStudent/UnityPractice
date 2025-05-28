@@ -6,6 +6,7 @@ public class Character : MonoBehaviour
     private const float FallingVelocityThreshold = 0.01f;
     
     [SerializeField] private Mover _mover;
+    [SerializeField] private Rotator _rotator;
     [SerializeField] private Jumper _jumper;
     [SerializeField] private GroundDetector _groundDetector;
     [SerializeField] private CharacterAnimator _characterAnimator;
@@ -51,10 +52,11 @@ public class Character : MonoBehaviour
     
     private void OnMovePressed(float axisDelta)
     {
-        _mover.StartMove(axisDelta);
+        bool isLookForward = axisDelta > 0.0f;
         
-        bool isMoveForward = axisDelta > 0.0f;
-        _characterAnimator.StartMove(isMoveForward);
+        _rotator.SetLookDirection(isLookForward);
+        _characterAnimator.StartMove();
+        _mover.StartMove(axisDelta);
     }
     
     private void OnMoveReleased()

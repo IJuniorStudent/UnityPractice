@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Mover))]
+[RequireComponent(typeof(Mover), typeof(Rotator))]
 public class BotMover : MonoBehaviour
 {
     private const float CheckDistanceThreshold = 0.01f;
@@ -9,6 +9,8 @@ public class BotMover : MonoBehaviour
     [SerializeField] private MonsterAnimator _monsterAnimator;
     
     private Mover _mover;
+    private Rotator _rotator;
+    
     private Transform _parentTransform;
     private Vector3 _targetPosition;
     
@@ -17,6 +19,7 @@ public class BotMover : MonoBehaviour
     private void Awake()
     {
         _mover = GetComponent<Mover>();
+        _rotator = GetComponent<Rotator>();
         _parentTransform = gameObject.transform;
     }
     
@@ -36,10 +39,11 @@ public class BotMover : MonoBehaviour
         _targetPosition = new Vector3(x, y, _parentTransform.position.z);
         
         float moveDistance = x - _parentTransform.position.x;
-        _mover.StartMove(moveDistance / Mathf.Abs(moveDistance));
+        bool isLookForward = moveDistance >= 0.0f;
         
-        bool isMoveForward = moveDistance >= 0.0f;
-        _monsterAnimator.StartMove(isMoveForward);
+        _rotator.SetLookDirection(isLookForward);
+        _mover.StartMove(moveDistance / Mathf.Abs(moveDistance));
+        _monsterAnimator.StartMove();
     }
     
     private bool IsTargetReached()
