@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -12,17 +11,14 @@ public class Mover : MonoBehaviour
     private float _moveDirection;
     
     public bool IsMoving => _isMoving;
-    
-    public event Action MoveForwardStarted;
-    public event Action MoveBackwardStarted;
-    public event Action MoveStopped;
+    public float VerticalSpeed => _rigidBody.velocity.y;
     
     private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
     }
     
-    private void Update()
+    private void FixedUpdate()
     {
         if (_isMoving)
             _rigidBody.velocity = new Vector2(_moveDirection * _speed, _rigidBody.velocity.y);
@@ -32,16 +28,11 @@ public class Mover : MonoBehaviour
     {
         _isMoving = true;
         _moveDirection = axisDelta;
-        
-        Action moveEvent = _moveDirection > 0.0f ? MoveForwardStarted : MoveBackwardStarted;
-        moveEvent?.Invoke();
     }
     
     public void StopMove()
     {
         _isMoving = false;
         _rigidBody.velocity = new Vector2(0, _rigidBody.velocity.y);
-        
-        MoveStopped?.Invoke();
     }
 }

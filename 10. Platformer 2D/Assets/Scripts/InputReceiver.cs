@@ -8,12 +8,12 @@ public class InputReceiver : MonoBehaviour
     private const string JumpAxis = "Jump";
     
     private Dictionary<string, bool> _holdState;
-
+    
     public event Action<float> MoveButtonDown;
     public event Action MoveButtonUp;
     public event Action<float> JumpButtonDown;
     
-    private void Start()
+    private void Awake()
     {
         _holdState = new Dictionary<string, bool>
         {
@@ -24,11 +24,11 @@ public class InputReceiver : MonoBehaviour
     
     private void Update()
     {
-        CheckAxisInput(HorizontalAxis, MoveButtonDown, MoveButtonUp);
-        CheckAxisInput(JumpAxis, JumpButtonDown, null);
+        UpdateAxisHoldState(HorizontalAxis, MoveButtonDown, MoveButtonUp);
+        UpdateAxisHoldState(JumpAxis, JumpButtonDown, null);
     }
     
-    private void CheckAxisInput(string axisName, Action<float> axisDownEvent, Action axisUpEvent)
+    private void UpdateAxisHoldState(string axisName, Action<float> axisDownEvent, Action axisUpEvent)
     {
         float axisDelta = Input.GetAxisRaw(axisName);
         

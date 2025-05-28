@@ -6,6 +6,8 @@ public class BotMover : MonoBehaviour
 {
     private const float CheckDistanceThreshold = 0.01f;
     
+    [SerializeField] private MonsterAnimator _monsterAnimator;
+    
     private Mover _mover;
     private Transform _parentTransform;
     private Vector3 _targetPosition;
@@ -20,14 +22,13 @@ public class BotMover : MonoBehaviour
     
     private void Update()
     {
-        if (_mover.IsMoving == false)
+        if (_mover.IsMoving == false || IsTargetReached() == false)
             return;
-
-        if (IsTargetReached())
-        {
-            _mover.StopMove();
-            TargetReached?.Invoke();
-        }
+        
+        _mover.StopMove();
+        _monsterAnimator.StopMove();
+        
+        TargetReached?.Invoke();
     }
     
     public void MoveTo(float x, float y)
@@ -36,6 +37,9 @@ public class BotMover : MonoBehaviour
         
         float moveDistance = x - _parentTransform.position.x;
         _mover.StartMove(moveDistance / Mathf.Abs(moveDistance));
+        
+        bool isMoveForward = moveDistance >= 0.0f;
+        _monsterAnimator.StartMove(isMoveForward);
     }
     
     private bool IsTargetReached()

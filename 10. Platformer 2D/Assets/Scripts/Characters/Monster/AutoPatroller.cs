@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using UnityEngine;
-using Random = System.Random;
 
 [RequireComponent(typeof(BotMover))]
 public class AutoPatroller : MonoBehaviour
@@ -39,6 +37,12 @@ public class AutoPatroller : MonoBehaviour
         _botMover.TargetReached -= OnTargetReached;
     }
     
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(gameObject.transform.position, new Vector3(_maxPatrolRadius * 2.0f, 1.0f, 0.0f));
+    }
+    
     private IEnumerator Walk()
     {
         while (enabled)
@@ -50,10 +54,10 @@ public class AutoPatroller : MonoBehaviour
     
     private void TryStartMove()
     {
-        if (_hasMoveTask || UnityEngine.Random.value > _startMoveProbability)
+        if (_hasMoveTask || Random.value > _startMoveProbability)
             return;
         
-        float targetX = UnityEngine.Random.Range(_minPositionX, _maxPositionX);
+        float targetX = Random.Range(_minPositionX, _maxPositionX);
         _botMover.MoveTo(targetX, gameObject.transform.position.y);
         _hasMoveTask = true;
     }
@@ -61,11 +65,5 @@ public class AutoPatroller : MonoBehaviour
     private void OnTargetReached()
     {
         _hasMoveTask = false;
-    }
-    
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(gameObject.transform.position, new Vector3(_maxPatrolRadius * 2.0f, 1.0f, 0.0f));
     }
 }
