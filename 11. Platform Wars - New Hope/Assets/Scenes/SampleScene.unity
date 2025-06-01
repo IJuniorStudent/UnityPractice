@@ -483,8 +483,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f91a6c82f6ba24b4db29915399d706f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _health: 30
-  _maxHealth: 100
+  _amount: 15
+  _maxAmount: 100
 --- !u!114 &66560097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -515,9 +515,9 @@ MonoBehaviour:
   _comboAnimEventReceiver: {fileID: 1741093250}
   _damageAnimEventReceiver: {fileID: 1741093251}
   _damageArea: {fileID: 1718993755}
-  _attackDamage: 15
-  _runAttackDamage: 20
-  _comboAttackDamage: 20
+  _attackDamage: 20
+  _runAttackDamage: 25
+  _comboAttackDamage: 25
 --- !u!114 &66560099
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10919,8 +10919,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f91a6c82f6ba24b4db29915399d706f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _health: 100
-  _maxHealth: 100
+  _amount: 100
+  _maxAmount: 100
 --- !u!114 &428252541
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21516,8 +21516,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f91a6c82f6ba24b4db29915399d706f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _health: 100
-  _maxHealth: 100
+  _amount: 100
+  _maxAmount: 100
 --- !u!114 &1375785930
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22056,8 +22056,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f91a6c82f6ba24b4db29915399d706f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _health: 100
-  _maxHealth: 100
+  _amount: 100
+  _maxAmount: 100
 --- !u!114 &1662738581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23006,8 +23006,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f91a6c82f6ba24b4db29915399d706f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _health: 100
-  _maxHealth: 100
+  _amount: 100
+  _maxAmount: 100
 --- !u!114 &1926145180
 MonoBehaviour:
   m_ObjectHideFlags: 0

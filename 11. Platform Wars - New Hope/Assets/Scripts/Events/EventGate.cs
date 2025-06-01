@@ -1,12 +1,6 @@
 using System;
 using UnityEngine;
 
-public enum GlobalEvent
-{
-    PlayerDie,
-    Restart
-}
-
 public class EventGate : MonoBehaviour
 {
     [SerializeField] private GlobalEventTransmitter _transmitter;
