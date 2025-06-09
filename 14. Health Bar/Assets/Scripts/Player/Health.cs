@@ -17,31 +17,30 @@ public class Health : MonoBehaviour
     
     public void Decrease(int delta)
     {
-        int value = Math.Clamp(delta, 0, _amount);
+        if (IsEmpty || delta <= 0)
+            return;
         
-        TryChange(-value);
+        int newValue = Math.Max(0, _amount - delta);
+        
+        SetValue(newValue);
     }
     
     public void Increase(int delta)
     {
-        int value = Math.Clamp(delta, 0, _maxAmount - _amount);
-        
-        TryChange(value);
-    }
-    
-    public void Reset()
-    {
-        TryChange(_maxAmount - _amount);
-    }
-    
-    private void TryChange(int delta)
-    {
-        if (delta == 0)
+        if (IsFull || delta <= 0)
             return;
         
+        int newValue = Math.Min(_amount + delta, _maxAmount);
+        
+        SetValue(newValue);
+    }
+    
+    private void SetValue(int value)
+    {
         int oldValue = _amount;
         
-        _amount += delta;
-        Changed?.Invoke(oldValue, _amount);
+        _amount = value;
+        
+        Changed?.Invoke(oldValue, value);
     }
 }

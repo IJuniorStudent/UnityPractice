@@ -2,36 +2,24 @@ using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(TMP_Text))]
-public class HealthTextDisplayer : MonoBehaviour
+public class HealthTextDisplayer : HealthDisplayer
 {
-    [SerializeField] private Health _health;
-    
     private TMP_Text _text;
     
     private void Awake()
     {
         _text = GetComponent<TMP_Text>();
         
-        DisplayHealth(_health.Amount);
+        DisplayHealth(Health.Amount);
     }
     
-    private void OnEnable()
-    {
-        _health.Changed += OnHealthChanged;
-    }
-    
-    private void OnDisable()
-    {
-        _health.Changed -= OnHealthChanged;
-    }
-    
-    private void OnHealthChanged(int oldValue, int newValue)
+    protected override void OnHealthChanged(int oldValue, int newValue)
     {
         DisplayHealth(newValue);
     }
     
     private void DisplayHealth(int value)
     {
-        _text.text = $"{value} / {_health.MaxAmount}";
+        _text.text = $"{value} / {Health.MaxAmount}";
     }
 }

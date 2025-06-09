@@ -2,9 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Slider))]
-public abstract class HealthBarDisplayer : MonoBehaviour
+public abstract class HealthBarDisplayer : HealthDisplayer
 {
-    [SerializeField] protected Health Health;
     [SerializeField] protected Image BarImage;
     
     protected Slider Slider;
@@ -18,16 +17,4 @@ public abstract class HealthBarDisplayer : MonoBehaviour
     {
         Slider.value = Health.Amount / Health.MaxAmount;
     }
-    
-    private void OnEnable()
-    {
-        Health.Changed += OnHealthChanged;
-    }
-    
-    private void OnDisable()
-    {
-        Health.Changed -= OnHealthChanged;
-    }
-    
-    protected abstract void OnHealthChanged(int oldValue, int newValue);
 }
