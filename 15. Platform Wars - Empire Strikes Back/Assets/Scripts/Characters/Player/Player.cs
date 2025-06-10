@@ -5,7 +5,6 @@ using UnityEngine;
 [RequireComponent(typeof(Jumper))]
 [RequireComponent(typeof(EventGate))]
 [RequireComponent(typeof(Restarter))]
-[RequireComponent(typeof(CollectableInteractor))]
 public class Player : MonoBehaviour, IDamageable
 {
     private const float VelocityThreshold = 0.5f;
@@ -26,7 +25,6 @@ public class Player : MonoBehaviour, IDamageable
     private Jumper _jumper;
     private EventGate _eventGate;
     private Restarter _restarter;
-    private CollectableInteractor _interactor;
     
     private bool _isJumping;
     private bool _isGrounded;
@@ -43,7 +41,6 @@ public class Player : MonoBehaviour, IDamageable
         _jumper = GetComponent<Jumper>();
         _eventGate = GetComponent<EventGate>();
         _restarter = GetComponent<Restarter>();
-        _interactor = GetComponent<CollectableInteractor>();
     }
     
     private void OnEnable()
@@ -67,8 +64,6 @@ public class Player : MonoBehaviour, IDamageable
         _damageArea.DamageDealt += OnDamageDealt;
         
         _eventGate.Restarted += OnRestarted;
-        
-        _interactor.Collected += OnCollected;
     }
     
     private void OnDisable()
@@ -92,8 +87,6 @@ public class Player : MonoBehaviour, IDamageable
         _damageArea.DamageDealt -= OnDamageDealt;
         
         _eventGate.Restarted -= OnRestarted;
-        
-        _interactor.Collected -= OnCollected;
     }
     
     private void FixedUpdate()
@@ -240,11 +233,5 @@ public class Player : MonoBehaviour, IDamageable
     {
         _restarter.Restore();
         _animator.Resurrect();
-    }
-    
-    private void OnCollected(CollectableItem item)
-    {
-        if (item.TryAffect(_interactor))
-            _interactor.ConfirmCollected(item);
     }
 }

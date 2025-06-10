@@ -3,16 +3,25 @@ using UnityEngine;
 
 public class CollectableInteractor : MonoBehaviour
 {
-    public event Action<CollectableItem> Collected;
+    [SerializeField] private HealPotionInteractor _healPotionInteractor;
+    
     public event Action<CollectableItem> CollectConfirmed;
     
-    public void TryCollect(CollectableItem item)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        Collected?.Invoke(item);
-    }
-    
-    public void ConfirmCollected(CollectableItem item)
-    {
-        CollectConfirmed?.Invoke(item);
+        if (other.gameObject.TryGetComponent(out CollectableItem item) == false)
+            return;
+
+        bool isItemUsed = false;
+        
+        switch (item)
+        {
+            case HealPotion potion:
+                isItemUsed = _healPotionInteractor.TryCollect(potion);
+                break;
+        }
+        
+        if (isItemUsed)
+            CollectConfirmed?.Invoke(item);
     }
 }

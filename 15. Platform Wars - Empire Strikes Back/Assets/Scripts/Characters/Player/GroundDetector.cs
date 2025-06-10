@@ -12,8 +12,10 @@ public class GroundDetector : MonoBehaviour
     
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.TryGetComponent<Ground>(out _))
-            _hitCount++;
+        if (other.gameObject.TryGetComponent<Ground>(out _) == false)
+            return;
+        
+        _hitCount++;
         
         if (_hitCount == DetectionHitCount)
             Stepped?.Invoke();
@@ -21,8 +23,10 @@ public class GroundDetector : MonoBehaviour
     
     private void OnCollisionExit2D(Collision2D other)
     {
-        if (other.gameObject.TryGetComponent<Ground>(out _))
-            _hitCount--;
+        if (other.gameObject.TryGetComponent<Ground>(out _) == false)
+            return;
+        
+        _hitCount--;
         
         if (_hitCount < DetectionHitCount)
             Lost?.Invoke();
