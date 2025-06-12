@@ -8,10 +8,10 @@ public abstract class LifeLimitedEntity : MonoBehaviour
     
     public event Action<LifeLimitedEntity> LifetimeExpired;
     
+    public abstract void Reset();
+    
     protected void InvokeLifetimeExpired(LifeLimitedEntity entity)
     {
         LifetimeExpired?.Invoke(entity);
     }
-    
-    public abstract void Reset();
 }
