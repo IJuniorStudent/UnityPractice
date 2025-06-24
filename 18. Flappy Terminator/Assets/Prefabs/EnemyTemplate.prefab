@@ -149,14 +149,13 @@ GameObject:
   - component: {fileID: 3744275770065599814}
   - component: {fileID: 5692775906372033351}
   - component: {fileID: 8427864957230084051}
-  - component: {fileID: 2210825017219980856}
   m_Layer: 7
   m_Name: EnemyTemplate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3721935286146077754
 Transform:
   m_ObjectHideFlags: 0
@@ -308,19 +307,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 5
   _lookDirection: {fileID: 5784136788809829359}
---- !u!114 &2210825017219980856
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 263899934370963601}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c23fdc9a8c45a3a479a7a8991dafad0b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _transmitter: {fileID: 0}
 --- !u!1 &3823759767336822030
 GameObject:
   m_ObjectHideFlags: 0
@@ -449,8 +435,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64cf10046ef7cac408d5293cd459339a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _targetLayerName: Player
-  _projectileSpawner: {fileID: 0}
+  _excludeLayers:
+    serializedVersion: 2
+    m_Bits: 128
   _blastEffect: {fileID: 457481059605001783}
   _projectileSprite: {fileID: 21300000, guid: 34f94635cc6b52541a60a0615cab7b4b, type: 3}
 --- !u!1 &6308678299346156520

@@ -1,42 +1,27 @@
 using UnityEngine;
 
-[RequireComponent(typeof(EventGate))]
 [RequireComponent(typeof(Collider2D))]
 public class FireStartArea : EnemyTriggerArea
 {
-    private EventGate _eventGate;
     private Collider2D _collider;
     
     private void Awake()
     {
-        _eventGate = GetComponent<EventGate>();
         _collider = GetComponent<Collider2D>();
     }
     
-    private void OnEnable()
+    public void Enable()
     {
-        _eventGate.PlayerDied += OnPlayerDied;
-        _eventGate.Restarted += OnRestarted;
+        _collider.enabled = true;
     }
     
-    private void OnDisable()
+    public void Disable()
     {
-        _eventGate.PlayerDied -= OnPlayerDied;
-        _eventGate.Restarted -= OnRestarted;
+        _collider.enabled = false;
     }
     
     protected override void OnEntered(Enemy enemy)
     {
         enemy.StartFire();
-    }
-    
-    private void OnPlayerDied()
-    {
-        _collider.enabled = false;
-    }
-    
-    private void OnRestarted()
-    {
-        _collider.enabled = true;
     }
 }

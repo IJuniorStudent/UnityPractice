@@ -3,7 +3,6 @@ using UnityEngine;
 
 [RequireComponent(typeof(EnemySpawner))]
 [RequireComponent(typeof(BoxArea))]
-[RequireComponent(typeof(EventGate))]
 public class AutoSpawner : MonoBehaviour
 {
     [SerializeField] private float _spawnInterval = 1.0f;
@@ -11,7 +10,6 @@ public class AutoSpawner : MonoBehaviour
     
     private EnemySpawner _spawner;
     private BoxArea _boxArea;
-    private EventGate _eventGate;
     private Quaternion _spawnRotation;
     private Coroutine _spawnRoutine;
     private WaitForSeconds _interval;
@@ -21,7 +19,6 @@ public class AutoSpawner : MonoBehaviour
     {
         _spawner = GetComponent<EnemySpawner>();
         _boxArea = GetComponent<BoxArea>();
-        _eventGate = GetComponent<EventGate>();
         
         _isSpawning = true;
         _interval = new WaitForSeconds(_spawnInterval);
@@ -33,25 +30,13 @@ public class AutoSpawner : MonoBehaviour
         StartSpawn();
     }
     
-    private void OnEnable()
-    {
-        _eventGate.PlayerDied += OnPlayerDied;
-        _eventGate.Restarted += OnRestarted;
-    }
-    
-    private void OnDisable()
-    {
-        _eventGate.PlayerDied -= OnPlayerDied;
-        _eventGate.Restarted -= OnRestarted;
-    }
-    
-    private void StartSpawn()
+    public void StartSpawn()
     {
         StopSpawn();
         _spawnRoutine = StartCoroutine(SpawnEnemies());
     }
     
-    private void StopSpawn()
+    public void StopSpawn()
     {
         if (_spawnRoutine == null)
             return;
@@ -73,15 +58,5 @@ public class AutoSpawner : MonoBehaviour
     {
         Enemy enemy = _spawner.Spawn(_boxArea.GetRandomPoint(), _spawnRotation);
         enemy.ResetState();
-    }
-    
-    private void OnPlayerDied()
-    {
-        StopSpawn();
-    }
-    
-    private void OnRestarted()
-    {
-        StartSpawn();
     }
 }

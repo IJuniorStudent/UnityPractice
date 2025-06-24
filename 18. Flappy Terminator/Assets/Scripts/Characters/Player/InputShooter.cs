@@ -27,12 +27,7 @@ public class InputShooter : MonoBehaviour
     
     private void OnFirePressed()
     {
-        if (_player.IsAlive == false)
-        {
-            _player.Respawn();
-            return;
-        }
-        
-        _shooter.Fire();
+        if (_player.IsAlive)
+            _shooter.Fire();
     }
 }

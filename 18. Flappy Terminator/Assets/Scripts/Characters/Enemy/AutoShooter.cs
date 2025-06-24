@@ -16,11 +16,6 @@ public class AutoShooter : MonoBehaviour
         _interval = new WaitForSeconds(_shootInterval);
     }
     
-    public void Initialize(ProjectileSpawner projectileSpawner)
-    {
-        _shooter.Initialize(projectileSpawner);
-    }
-    
     public void StartFire()
     {
         StopFire();

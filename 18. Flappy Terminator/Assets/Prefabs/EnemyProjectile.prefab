@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 923268089342211599}
   - component: {fileID: 8480389712424969034}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: View
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,13 +96,13 @@ GameObject:
   - component: {fileID: 2125776431915256028}
   - component: {fileID: 7838942622017942821}
   - component: {fileID: 579019748003683241}
-  m_Layer: 0
-  m_Name: ProjectileTemplate
+  m_Layer: 6
+  m_Name: EnemyProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4964258860479368063
 Transform:
   m_ObjectHideFlags: 0

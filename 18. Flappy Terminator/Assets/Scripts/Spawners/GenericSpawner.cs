@@ -1,17 +1,21 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-[RequireComponent(typeof(EventGate))]
 public abstract class GenericSpawner<T> : MonoBehaviour where T : MonoBehaviour
 {
     [SerializeField] private int _poolCapacity = 10;
     [SerializeField] private int _poolMaxSize = 100;
     [SerializeField] private T _prefab;
     
-    private EventGate _eventGate;
     private ObjectPool<T> _pool;
-    private List<T> _activeObjects;
+    private HashSet<T> _activeObjects;
+    
+    public event Action<T> Created;
+    public event Action<T> Destroyed;
+    
+    public IEnumerable<T> ActiveObjects => _activeObjects;
     
     private void Awake()
     {
@@ -25,18 +29,15 @@ public abstract class GenericSpawner<T> : MonoBehaviour where T : MonoBehaviour
             maxSize: _poolMaxSize
         );
         
-        _activeObjects = new List<T>();
-        _eventGate = GetComponent<EventGate>();
+        _activeObjects = new HashSet<T>();
     }
     
-    private void OnEnable()
+    public void ReleaseActive()
     {
-        _eventGate.Restarted += OnRestarted;
-    }
-    
-    private void OnDisable()
-    {
-        _eventGate.Restarted -= OnRestarted;
+        foreach (T activeObject in _activeObjects)
+            _pool.Release(activeObject);
+        
+        _activeObjects.Clear();
     }
     
     public T Spawn(Vector3 position, Quaternion rotation)
@@ -64,6 +65,7 @@ public abstract class GenericSpawner<T> : MonoBehaviour where T : MonoBehaviour
     {
         T createdObject = Instantiate(_prefab);
         OnObjectCreate(createdObject);
+        Created?.Invoke(createdObject);
         
         return createdObject;
     }
@@ -80,15 +82,8 @@ public abstract class GenericSpawner<T> : MonoBehaviour where T : MonoBehaviour
     
     private void DestroyObject(T objectToDestroy)
     {
+        Destroyed?.Invoke(objectToDestroy);
         OnObjectDestroy(objectToDestroy);
         Destroy(objectToDestroy.gameObject);
-    }
-    
-    private void OnRestarted()
-    {
-        foreach (var spawnedObject in _activeObjects)
-            _pool.Release(spawnedObject);
-        
-        _activeObjects.Clear();
     }
 }

@@ -28,8 +28,6 @@ public abstract class BaseCharacter : MonoBehaviour
         _explodeEventReceiver.ExplodeStarted += OnExplodeStarted;
         _explodeEventReceiver.Exploded += OnExploded;
         _explodeEventReceiver.ExplodeFinished += OnExplodeFinished;
-        
-        Enabled();
     }
     
     private void OnDisable()
@@ -38,8 +36,6 @@ public abstract class BaseCharacter : MonoBehaviour
         _explodeEventReceiver.ExplodeStarted -= OnExplodeStarted;
         _explodeEventReceiver.Exploded -= OnExploded;
         _explodeEventReceiver.ExplodeFinished -= OnExplodeFinished;
-        
-        Disabled();
     }
     
     public void Explode()
@@ -50,8 +46,6 @@ public abstract class BaseCharacter : MonoBehaviour
     }
     
     protected abstract void Awoke();
-    protected abstract void Enabled();
-    protected abstract void Disabled();
     protected abstract void OnExplodeStarted();
     protected abstract void OnExplodeFinished();
     

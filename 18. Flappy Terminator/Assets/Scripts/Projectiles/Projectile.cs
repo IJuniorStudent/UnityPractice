@@ -15,9 +15,4 @@ public class Projectile : MonoBehaviour
         Collided?.Invoke(this);
         target.InvokeProjectileCollided();
     }
-    
-    public void SetSprite(Sprite sprite)
-    {
-        _renderer.sprite = sprite;
-    }
 }
