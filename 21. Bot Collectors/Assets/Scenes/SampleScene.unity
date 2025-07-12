@@ -583,53 +583,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 491789716}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &599583050
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 599583052}
-  - component: {fileID: 599583051}
-  m_Layer: 0
-  m_Name: UnitSpawner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &599583051
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 599583050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21f3d9bedd3f4de49ba7c3a02213af88, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _poolCapacity: 10
-  _poolMaxSize: 100
-  _prefab: {fileID: 2678252326930791225, guid: f20ac2d7f6c71c449ba406afb47c5aa9, type: 3}
---- !u!4 &599583052
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 599583050}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -998,6 +951,7 @@ GameObject:
   - component: {fileID: 1111330431}
   - component: {fileID: 1111330435}
   - component: {fileID: 1111330438}
+  - component: {fileID: 1111330439}
   - component: {fileID: 1111330437}
   m_Layer: 0
   m_Name: Base
@@ -1067,10 +1021,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c082faf5b60140a46878dc04d8ca3ff2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _multiBoxArea: {fileID: 1070177857}
-  _unitSpawner: {fileID: 599583051}
+  _unitCreator: {fileID: 1111330439}
   _resourceScanner: {fileID: 285582347}
-  _initialUnitsCount: 3
+  _resourceCreator: {fileID: 2088103429}
   _scanInterval: 3
 --- !u!114 &1111330438
 MonoBehaviour:
@@ -1085,6 +1038,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _resourcesAmount: {fileID: 1979596647}
+--- !u!114 &1111330439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1111330430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65971e3d8185d1d43b77081cd51c0cb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpawnArea: {fileID: 1070177857}
+  _initialCount: 3
+  _prefab: {fileID: 2678252326930791225, guid: f20ac2d7f6c71c449ba406afb47c5aa9, type: 3}
 --- !u!1 &1247911594
 GameObject:
   m_ObjectHideFlags: 0
@@ -6262,7 +6230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: befabfdd98453a441ba5b2b5d7a227b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spawnArea: {fileID: 2088103428}
+  SpawnArea: {fileID: 2088103428}
   _spawner: {fileID: 2088103430}
   _spawnInterval: 5
   _resourcesCountPerSpawn: 2
@@ -6333,6 +6301,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Resource
       objectReference: {fileID: 0}
+    - target: {fileID: 5527277497252561762, guid: 4845db9d23d777049b454738eb4f00a7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6349,6 +6321,10 @@ PrefabInstance:
     - target: {fileID: 4013751370021809166, guid: f20ac2d7f6c71c449ba406afb47c5aa9, type: 3}
       propertyPath: m_Name
       value: Unit
+      objectReference: {fileID: 0}
+    - target: {fileID: 4013751370021809166, guid: f20ac2d7f6c71c449ba406afb47c5aa9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8784778802320501089, guid: f20ac2d7f6c71c449ba406afb47c5aa9, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6406,5 +6382,4 @@ SceneRoots:
   - {fileID: 4248634884201143414}
   - {fileID: 1669559758280015572}
   - {fileID: 2088103427}
-  - {fileID: 599583052}
   - {fileID: 1247911597}

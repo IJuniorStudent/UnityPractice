@@ -1,16 +1,20 @@
 using System;
 using UnityEngine;
 
+[RequireComponent(typeof(ResourceTransporter))]
 public class ResourceCollector : MonoBehaviour
 {
-    [SerializeField] private Transform _resourceAttachPivot;
-
     private CollectableResource _targetResource;
-    private CollectableResource _collectedResource;
-
-    public event Action<ResourceCollector> ResourceCollected;
-    public event Action<ResourceCollector> ResourceStored;
+    private ResourceTransporter _transporter;
     
+    public event Action<CollectableResource> ResourceCollected;
+    public event Action<CollectableResource> ResourceDelivered;
+    
+    private void Awake()
+    {
+        _transporter = GetComponent<ResourceTransporter>();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.TryGetComponent(out CollectorTarget target) == false)
@@ -31,30 +35,25 @@ public class ResourceCollector : MonoBehaviour
     public void SetCollectTarget(CollectableResource resource)
     {
         _targetResource = resource;
-        _targetResource.Reserve();
     }
     
     private void TryObtainResource(CollectableResource resource)
     {
-        if (resource != _targetResource || _collectedResource != null || resource.TryAttach(_resourceAttachPivot) == false)
+        if (resource != _targetResource || _transporter.TryAttach(resource.transform) == false)
             return;
         
-        _collectedResource = resource;
-        ResourceCollected?.Invoke(this);
+        resource.SetStateCollected();
+        ResourceCollected?.Invoke(resource);
     }
     
     private void TryStoreResource(ResourceStorage storage)
     {
-        if (_collectedResource == null || _collectedResource.TryDetach() == false)
+        if (_transporter.TryDetach() == false)
             return;
         
-        storage.Store(_collectedResource.Value);
+        storage.Store(_targetResource.Value);
+        ResourceDelivered?.Invoke(_targetResource);
         
-        _collectedResource.Store();
-        _collectedResource.Free();
-        _collectedResource = null;
         _targetResource = null;
-        
-        ResourceStored?.Invoke(this);
     }
 }

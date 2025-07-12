@@ -12,8 +12,8 @@ public class Unit : MonoBehaviour
     public Transform MoveTarget { get; private set; }
     public float MoveSpeed => _moveSpeed;
     
-    public event Action<Unit> ResourceCollected;
-    public event Action<Unit> ResourceStored;
+    public event Action<Unit, CollectableResource> ResourceCollected;
+    public event Action<Unit, CollectableResource> ResourceStored;
     
     private void Awake()
     {
@@ -26,13 +26,13 @@ public class Unit : MonoBehaviour
     private void OnEnable()
     {
         _collector.ResourceCollected += OnResourceCollected;
-        _collector.ResourceStored += OnResourceStored;
+        _collector.ResourceDelivered += OnResourceStored;
     }
     
     private void OnDisable()
     {
         _collector.ResourceCollected -= OnResourceCollected;
-        _collector.ResourceStored -= OnResourceStored;
+        _collector.ResourceDelivered -= OnResourceStored;
     }
     
     private void Update()
@@ -58,15 +58,15 @@ public class Unit : MonoBehaviour
         _stateMachine.ChangeState<MoveState>();
     }
     
-    private void OnResourceCollected(ResourceCollector collector)
+    private void OnResourceCollected(CollectableResource resource)
     {
         _stateMachine.ChangeState<IdleState>();
-        ResourceCollected?.Invoke(this);
+        ResourceCollected?.Invoke(this, resource);
     }
     
-    private void OnResourceStored(ResourceCollector collector)
+    private void OnResourceStored(CollectableResource resource)
     {
         _stateMachine.ChangeState<IdleState>();
-        ResourceStored?.Invoke(this);
+        ResourceStored?.Invoke(this, resource);
     }
 }

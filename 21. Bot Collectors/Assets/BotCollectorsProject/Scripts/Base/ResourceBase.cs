@@ -5,14 +5,10 @@ using UnityEngine;
 
 public class ResourceBase : MonoBehaviour
 {
-    [SerializeField] private MultiBoxArea _multiBoxArea;
-    [SerializeField] private UnitSpawner _unitSpawner;
+    [SerializeField] private UnitCreator _unitCreator;
     [SerializeField] private ResourceScanner _resourceScanner;
-    [SerializeField] private int _initialUnitsCount = 3;
+    [SerializeField] private ResourceCreator _resourceCreator;
     [SerializeField] private int _scanInterval = 3;
-    
-    private HashSet<Unit> _freeUnits = new();
-    private HashSet<Unit> _busyUnits = new();
     
     private WaitForSeconds _scanDelay;
     
@@ -23,39 +19,19 @@ public class ResourceBase : MonoBehaviour
     
     private void Start()
     {
-        StartCoroutine(SpawnUnits(_initialUnitsCount));
         StartCoroutine(ScanResources());
     }
     
     private void OnEnable()
     {
         _resourceScanner.ResourcesCollected += OnResourcesScanned;
+        _unitCreator.Created += OnUnitCreated;
     }
     
     private void OnDisable()
     {
         _resourceScanner.ResourcesCollected -= OnResourcesScanned;
-    }
-    
-    private IEnumerator SpawnUnits(int unitsCount)
-    {
-        for (int i = 0; i < unitsCount; i++)
-        {
-            SpawnUnit();
-            yield return null;
-        }
-    }
-    
-    private void SpawnUnit()
-    {
-        Vector3 position = _multiBoxArea.GetRandomPoint();
-        Quaternion rotation = Quaternion.Euler(0, UnityEngine.Random.value * 360.0f, 0);
-        Unit unit = _unitSpawner.Spawn(position, rotation);
-
-        unit.ResourceCollected += OnUnitCollectedResource;
-        unit.ResourceStored += OnUnitStoredResource;
-        
-        _freeUnits.Add(unit);
+        _unitCreator.Created -= OnUnitCreated;
     }
     
     private IEnumerator ScanResources()
@@ -67,54 +43,55 @@ public class ResourceBase : MonoBehaviour
         }
     }
     
-    private bool TryGetFreeUnit(out Unit freeUnit)
+    private void OnResourcesScanned(IReadOnlyList<CollectableResource> resources)
     {
-        foreach (Unit unit in _freeUnits)
-        {
-            freeUnit = unit;
-            return true;
-        }
+        if (_unitCreator.FreeCount == 0)
+            return;
         
-        freeUnit = null;
-        return false;
-    }
-    
-    private void SetUnitBusy(Unit unit)
-    {
-        _freeUnits.Remove(unit);
-        _busyUnits.Add(unit);
-    }
-    
-    private void SetUnitFree(Unit unit)
-    {
-        _busyUnits.Remove(unit);
-        _freeUnits.Add(unit);
-    }
-    
-    private void OnResourcesScanned(List<CollectableResource> resources)
-    {
-        int maxJobs = Math.Min(_freeUnits.Count, resources.Count);
+        List<CollectableResource> freeResources = FilterResources(resources);
+        int maxJobs = Math.Min(_unitCreator.FreeCount, freeResources.Count);
         
         for (int i = 0; i < maxJobs; i++)
         {
-            CollectableResource resource = resources[i];
+            CollectableResource resource = freeResources[i];
             
-            if (TryGetFreeUnit(out Unit unit) == false)
+            if (_unitCreator.TryGetFreeObject(out Unit unit) == false)
                 continue;
             
-            unit.CollectResource(resource);
+            _unitCreator.TryReserve(unit);
+            _resourceCreator.TryReserve(resource);
             
-            SetUnitBusy(unit);
+            resource.SetStateReserved();
+            unit.CollectResource(resource);
         }
     }
     
-    private void OnUnitCollectedResource(Unit unit)
+    private List<CollectableResource> FilterResources(IReadOnlyList<CollectableResource> resources)
     {
+        var filtered = new List<CollectableResource>();
+        
+        foreach (CollectableResource resource in resources)
+            if (_resourceCreator.IsFree(resource))
+                filtered.Add(resource);
+        
+        return filtered;
+    }
+    
+    private void OnUnitCreated(Unit unit)
+    {
+        unit.ResourceCollected += OnUnitCollectedResource;
+        unit.ResourceStored += OnUnitStoredResource;
+    }
+    
+    private void OnUnitCollectedResource(Unit unit, CollectableResource resource)
+    {
+        resource.SetStateCollected();
         unit.MoveTo(gameObject.transform);
     }
     
-    private void OnUnitStoredResource(Unit unit)
+    private void OnUnitStoredResource(Unit unit, CollectableResource resource)
     {
-        SetUnitFree(unit);
+        _unitCreator.TryFree(unit);
+        _resourceCreator.TryFree(resource);
     }
 }

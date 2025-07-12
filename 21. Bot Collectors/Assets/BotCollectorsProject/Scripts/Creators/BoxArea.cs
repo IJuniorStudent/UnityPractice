@@ -7,7 +7,8 @@ public class BoxArea : MonoBehaviour
     
     private void Awake()
     {
-        Vector3 halfScale = gameObject.transform.localScale / 2.0f;
+        float halfDivisor = 2.0f;
+        Vector3 halfScale = gameObject.transform.localScale / halfDivisor;
         
         _minPoint = gameObject.transform.position - halfScale;
         _maxPoint = gameObject.transform.position + halfScale;

@@ -13,8 +13,8 @@ public class ResourceScanner : MonoBehaviour
     private WaitForSeconds _collectWaitDelay;
     private float _collectRadius;
     private Collider[] _scanCache;
-
-    public event Action<List<CollectableResource>> ResourcesCollected;
+    
+    public event Action<IReadOnlyList<CollectableResource>> ResourcesCollected;
     
     private void Awake()
     {
@@ -44,17 +44,17 @@ public class ResourceScanner : MonoBehaviour
     private void CollectResources()
     {
         int foundCount = Physics.OverlapSphereNonAlloc(gameObject.transform.position, _collectRadius, _scanCache, _scanLayers);
-
+        
         if (foundCount == 0)
             return;
         
-        List<CollectableResource> resources = new();
+        var foundResources = new List<CollectableResource>();
         
         for (int i = 0; i < foundCount; i++)
-            if (_scanCache[i].TryGetComponent(out CollectableResource resource) && resource.CanBeCollected)
-                resources.Add(resource);
+            if (_scanCache[i].TryGetComponent(out CollectableResource resource))
+                foundResources.Add(resource);
         
-        if (resources.Count > 0)
-            ResourcesCollected?.Invoke(resources);
+        if (foundResources.Count > 0)
+            ResourcesCollected?.Invoke(foundResources);
     }
 }
