@@ -1,12 +1,11 @@
 using System;
+using UnityEngine;
 
-public class ResourceStorage : CollectorTarget
+public class ResourceStorage : MonoBehaviour
 {
     private int _resourcesCount;
     
     public event Action<int> AmountChanged;
-    
-    public int Count => _resourcesCount;
     
     public void Store(int count)
     {

@@ -4,26 +4,32 @@ public class ResourceTransporter : MonoBehaviour
 {
     [SerializeField] private Transform _attachPivot;
     
-    private Transform _attachedResource;
+    private CollectableResource _attachedResource;
     
-    public bool TryAttach(Transform resource)
+    public bool IsAttached => _attachedResource != null;
+    
+    public bool TryAttach(CollectableResource resource)
     {
         if (_attachedResource != null)
             return false;
         
-        resource.SetParent(_attachPivot);
-        resource.localPosition = Vector3.zero;
+        resource.gameObject.transform.SetParent(_attachPivot);
+        resource.gameObject.transform.localPosition = Vector3.zero;
         _attachedResource = resource;
         
         return true;
     }
     
-    public bool TryDetach()
+    public bool TryDetach(out CollectableResource resource)
     {
+        resource = null;
+        
         if (_attachedResource == null)
             return false;
         
-        _attachedResource.SetParent(null);
+        _attachedResource.gameObject.transform.SetParent(null);
+        
+        resource = _attachedResource;
         _attachedResource = null;
         
         return true;

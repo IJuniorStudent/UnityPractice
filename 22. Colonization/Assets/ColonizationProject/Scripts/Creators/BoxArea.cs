@@ -14,7 +14,7 @@ public class BoxArea : MonoBehaviour
         _maxPoint = gameObject.transform.position + halfScale;
     }
     
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(transform.position, gameObject.transform.localScale);

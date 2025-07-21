@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ResourceBase : RaycastTarget
+public class ResourceBase : MonoBehaviour, ICollectorTarget, IRaycastTarget
 {
     private const int MinUnitsToCreateBase = 2;
     
@@ -12,10 +12,12 @@ public class ResourceBase : RaycastTarget
     [SerializeField] private ResourceStorage _resourceStorage;
     [SerializeField] private ResourceScanner _resourceScanner;
     [SerializeField] private int _scanInterval = 3;
+    [SerializeField] private int _unitCreateCost = 3;
+    [SerializeField] private int _baseCreateCost = 5;
     
-    private StateMachine<ResourceBase> _stateMachine;
     private ResourceCreator _resourceCreator;
     private WaitForSeconds _scanDelay;
+    private bool _isBaseCreateWait;
     
     public event Action<bool> SelectStateChanged;
     public event Action<ResourceBase, Unit, Vector3> UnitCreatedResourceBase;
@@ -24,10 +26,6 @@ public class ResourceBase : RaycastTarget
     private void Awake()
     {
         _scanDelay = new WaitForSeconds(_scanInterval);
-        
-        var factory = new ResourceBaseStateFactory(this, _resourceStorage);
-        _stateMachine = new StateMachine<ResourceBase>(factory.CreateStates());
-        _stateMachine.ChangeState<UnitCreateState>();
     }
     
     private void Start()
@@ -60,7 +58,7 @@ public class ResourceBase : RaycastTarget
     
     public void TryScheduleBaseCreation(Vector3 position)
     {
-        if (_flagCreator.IsWorkActive)
+        if (_flagCreator.IsActive)
         {
             _flagCreator.UpdatePosition(position);
             return;
@@ -70,7 +68,7 @@ public class ResourceBase : RaycastTarget
             return;
         
         _flagCreator.Activate(position);
-        _stateMachine.ChangeState<ResourceBaseCreateState>();
+        _isBaseCreateWait = true;
     }
     
     public void CreateInitialUnits(int count)
@@ -78,13 +76,35 @@ public class ResourceBase : RaycastTarget
         _unitCreator.Create(count);
     }
     
-    public void TryCreateNewUnit(int resourceCost)
+    public void Link(Unit unit)
     {
-        if (_resourceStorage.TrySpend(resourceCost))
+        _unitCreator.Link(unit);
+        _unitCreator.Relocate(unit);
+        
+        UnitCountChanged?.Invoke(_unitCreator.TotalCount);
+        
+        unit.ResourceDelivered += OnUnitDeliveredResource;
+        unit.ResourceBaseCreated += OnUnitCreatedResourceBase;
+        
+        unit.SetHomeBase(this);
+    }
+    
+    public void Unlink(Unit unit)
+    {
+        unit.ResourceDelivered -= OnUnitDeliveredResource;
+        unit.ResourceBaseCreated -= OnUnitCreatedResourceBase;
+        
+        _unitCreator.Unlink(unit);
+        UnitCountChanged?.Invoke(_unitCreator.TotalCount);
+    }
+    
+    private void TryCreateNewUnit()
+    {
+        if (_resourceStorage.TrySpend(_unitCreateCost))
             _unitCreator.Create(1);
     }
     
-    public void TryCreateNewBase(int resourceCost)
+    private void TryCreateNewBase()
     {
         if (_unitCreator.FreeCount == 0)
             return;
@@ -95,37 +115,14 @@ public class ResourceBase : RaycastTarget
         if (_unitCreator.TryReserve(unit) == false)
             return;
         
-        if (_resourceStorage.TrySpend(resourceCost) == false)
+        if (_resourceStorage.TrySpend(_baseCreateCost) == false)
         {
             _unitCreator.TryFree(unit);
             return;
         }
         
         _flagCreator.SetWorker(unit);
-        _stateMachine.ChangeState<UnitCreateState>();
-    }
-    
-    public void Link(Unit unit)
-    {
-        _unitCreator.Link(unit);
-        _unitCreator.Relocate(unit);
-        UnitCountChanged?.Invoke(_unitCreator.TotalCount);
-        
-        unit.ResourceCollected += OnUnitCollectedResource;
-        unit.ResourceStored += OnUnitStoredResource;
-        unit.ResourceBaseCreated += OnUnitCreatedResourceBase;
-        
-        unit.SetHomeStorage(_resourceStorage);
-    }
-    
-    public void Unlink(Unit unit)
-    {
-        unit.ResourceCollected -= OnUnitCollectedResource;
-        unit.ResourceStored -= OnUnitStoredResource;
-        unit.ResourceBaseCreated -= OnUnitCreatedResourceBase;
-        
-        _unitCreator.Unlink(unit);
-        UnitCountChanged?.Invoke(_unitCreator.TotalCount);
+        _isBaseCreateWait = false;
     }
     
     private IEnumerator ScanResources()
@@ -142,7 +139,7 @@ public class ResourceBase : RaycastTarget
         if (_unitCreator.FreeCount == 0)
             return;
         
-        List<CollectableResource> freeResources = FilterResources(resources);
+        List<CollectableResource> freeResources = _resourceCreator.FilterFreeSortedResources(resources, gameObject.transform.position);
         int maxJobs = Math.Min(_unitCreator.FreeCount, freeResources.Count);
         
         for (int i = 0; i < maxJobs; i++)
@@ -160,36 +157,29 @@ public class ResourceBase : RaycastTarget
         }
     }
     
-    private List<CollectableResource> FilterResources(IReadOnlyList<CollectableResource> resources)
+    private void OnUnitDeliveredResource(Unit unit)
     {
-        var filtered = new List<CollectableResource>();
+        if (unit.TryDetachResource(out CollectableResource resource) == false)
+            return;
         
-        foreach (CollectableResource resource in resources)
-            if (_resourceCreator.IsFree(resource))
-                filtered.Add(resource);
-        
-        return filtered;
-    }
-    
-    private void OnUnitCollectedResource(Unit unit, CollectableResource resource)
-    {
-        resource.SetStateCollected();
-        unit.MoveTo(gameObject.transform);
-    }
-    
-    private void OnUnitStoredResource(Unit unit, CollectableResource resource)
-    {
-        _unitCreator.TryFree(unit);
+        _resourceStorage.Store(resource.Value);
         _resourceCreator.TryFree(resource);
-        _stateMachine.PerformCurrentState(state =>
-        {
-            (state as ResourceBaseCollectState)?.NotifyResourceCollected();
-        });
+        _unitCreator.TryFree(unit);
+        
+        SelectNextJob();
     }
     
     private void OnUnitCreatedResourceBase(Unit unit)
     {
         _flagCreator.Deactivate();
         UnitCreatedResourceBase?.Invoke(this, unit, _flagCreator.Position);
+    }
+    
+    private void SelectNextJob()
+    {
+        if (_flagCreator.IsActive && _isBaseCreateWait)
+            TryCreateNewBase();
+        else
+            TryCreateNewUnit();
     }
 }

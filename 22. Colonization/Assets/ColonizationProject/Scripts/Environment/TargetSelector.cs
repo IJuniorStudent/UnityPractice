@@ -17,12 +17,12 @@ public class TargetSelector : MonoBehaviour
         _raycaster.ClickedOnTarget -= OnTargetClicked;
     }
     
-    private void OnTargetClicked(RaycastTarget target, Vector3 hitPoint)
+    private void OnTargetClicked(IRaycastTarget target, Vector3 hitPoint)
     {
         switch (target)
         {
             case ResourceBase resourceBase:
-                SelectResourceBase(resourceBase);
+                ToggleResourceBaseSelected(resourceBase);
                 break;
             
             case Ground _:
@@ -34,7 +34,7 @@ public class TargetSelector : MonoBehaviour
         }
     }
     
-    private void SelectResourceBase(ResourceBase resourceBase)
+    private void ToggleResourceBaseSelected(ResourceBase resourceBase)
     {
         if (_selectedBase != resourceBase)
         {
@@ -50,10 +50,6 @@ public class TargetSelector : MonoBehaviour
     
     private void TrySetBaseCreatePosition(Vector3 position)
     {
-        if (_selectedBase == null)
-            return;
-        
-        _selectedBase.TryScheduleBaseCreation(position);
-        _selectedBase = null;
+        _selectedBase?.TryScheduleBaseCreation(position);
     }
 }

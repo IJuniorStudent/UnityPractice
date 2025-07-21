@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class CollectableResource : CollectorTarget
+public class CollectableResource : MonoBehaviour, ICollectorTarget
 {
     [SerializeField] private int _value = 1;
     

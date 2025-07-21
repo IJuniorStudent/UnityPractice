@@ -10,7 +10,8 @@ public class UnitStateFactory: BaseStateFactory<Unit>
         return new Dictionary<Type, BaseState<Unit>>
         {
             [typeof(UnitIdleState)] = new UnitIdleState(Owner),
-            [typeof(UnitMoveState)] = new UnitMoveState(Owner)
+            [typeof(UnitMoveState)] = new UnitMoveState(Owner),
+            [typeof(UnitBuildMoveState)] = new UnitBuildMoveState(Owner)
         };
     }
 }

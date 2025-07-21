@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ResourceCreator : GenericCreator<CollectableResource>
@@ -42,6 +43,22 @@ public class ResourceCreator : GenericCreator<CollectableResource>
         }
         
         return isFreed;
+    }
+    
+    public List<CollectableResource> FilterFreeSortedResources(IReadOnlyList<CollectableResource> resources, Vector3 center)
+    {
+        var filtered = new List<CollectableResource>();
+        
+        foreach (CollectableResource resource in resources)
+            if (IsFree(resource))
+                filtered.Add(resource);
+        
+        filtered.Sort((resourceA, resourceB) =>
+            (center - resourceA.transform.position).sqrMagnitude.CompareTo(
+                (center - resourceB.transform.position).sqrMagnitude)
+        );
+        
+        return filtered;
     }
     
     private IEnumerator SpawnResources()

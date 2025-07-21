@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(ResourceCollector))]
+[RequireComponent(typeof(ResourceTransporter))]
 [RequireComponent(typeof(ResourceBaseBuilder))]
 public class Unit : MonoBehaviour
 {
@@ -9,19 +10,21 @@ public class Unit : MonoBehaviour
     
     private StateMachine<Unit> _stateMachine;
     private ResourceCollector _collector;
+    private ResourceTransporter _transporter;
     private ResourceBaseBuilder _builder;
+    private ResourceBase _homeBase;
     
     public Transform MoveTarget { get; private set; }
     public float MoveSpeed => _moveSpeed;
     
-    public event Action<Unit, CollectableResource> ResourceCollected;
-    public event Action<Unit, CollectableResource> ResourceStored;
+    public event Action<Unit> ResourceDelivered;
     public event Action<Unit> ResourceBaseCreated;
     
     private void Awake()
     {
         _collector = GetComponent<ResourceCollector>();
         _builder = GetComponent<ResourceBaseBuilder>();
+        _transporter = GetComponent<ResourceTransporter>();
         
         var stateFactory = new UnitStateFactory(this);
         _stateMachine = new StateMachine<Unit>(stateFactory.CreateStates());
@@ -31,14 +34,14 @@ public class Unit : MonoBehaviour
     private void OnEnable()
     {
         _collector.ResourceCollected += OnResourceCollected;
-        _collector.ResourceDelivered += OnResourceStored;
+        _collector.ResourceDelivered += OnResourceDelivered;
         _builder.ResourceBaseBuilt += OnResourceBaseBuilt;
     }
     
     private void OnDisable()
     {
         _collector.ResourceCollected -= OnResourceCollected;
-        _collector.ResourceDelivered -= OnResourceStored;
+        _collector.ResourceDelivered -= OnResourceDelivered;
         _builder.ResourceBaseBuilt -= OnResourceBaseBuilt;
     }
     
@@ -47,9 +50,9 @@ public class Unit : MonoBehaviour
         _stateMachine.Update();
     }
     
-    public void SetHomeStorage(ResourceStorage storage)
+    public void SetHomeBase(ResourceBase homeBase)
     {
-        _collector.SetHomeStorage(storage);
+        _homeBase = homeBase;
     }
     
     public void CollectResource(CollectableResource resource)
@@ -61,7 +64,30 @@ public class Unit : MonoBehaviour
         MoveTo(resource.gameObject.transform);
     }
     
-    public void MoveTo(Transform moveTarget)
+    public void BuildBase(Transform moveTarget)
+    {
+        if (_stateMachine.IsInState<UnitIdleState>() == false)
+            return;
+        
+        MoveTarget = moveTarget;
+        _stateMachine.ChangeState<UnitBuildMoveState>();
+    }
+    
+    public void UpdateBuildTarget()
+    {
+        if (_stateMachine.IsInState<UnitBuildMoveState>() == false)
+            return;
+        
+        _stateMachine.ChangeState<UnitIdleState>();
+        BuildBase(MoveTarget);
+    }
+    
+    public bool TryDetachResource(out CollectableResource resource)
+    {
+        return _transporter.TryDetach(out resource);
+    }
+    
+    private void MoveTo(Transform moveTarget)
     {
         if (_stateMachine.IsInState<UnitIdleState>() == false)
             return;
@@ -70,29 +96,31 @@ public class Unit : MonoBehaviour
         _stateMachine.ChangeState<UnitMoveState>();
     }
     
-    public void UpdateMoveTarget(Transform moveTarget)
+    private void OnResourceCollected(CollectableResource resource)
     {
-        if (_stateMachine.IsInState<UnitMoveState>() == false)
+        if (_stateMachine.IsInState<UnitMoveState>() == false || _transporter.TryAttach(resource) == false)
+            return;
+        
+        resource.SetStateCollected();
+        _stateMachine.ChangeState<UnitIdleState>();
+        
+        MoveTo(_homeBase.gameObject.transform);
+    }
+    
+    private void OnResourceDelivered(ResourceBase resourceBase)
+    {
+        if (resourceBase != _homeBase || _transporter.IsAttached == false)
             return;
         
         _stateMachine.ChangeState<UnitIdleState>();
-        MoveTo(moveTarget);
-    }
-    
-    private void OnResourceCollected(CollectableResource resource)
-    {
-        _stateMachine.ChangeState<UnitIdleState>();
-        ResourceCollected?.Invoke(this, resource);
-    }
-    
-    private void OnResourceStored(CollectableResource resource)
-    {
-        _stateMachine.ChangeState<UnitIdleState>();
-        ResourceStored?.Invoke(this, resource);
+        ResourceDelivered?.Invoke(this);
     }
     
     private void OnResourceBaseBuilt()
     {
+        if (_stateMachine.IsInState<UnitBuildMoveState>() == false)
+            return;
+        
         _stateMachine.ChangeState<UnitIdleState>();
         ResourceBaseCreated?.Invoke(this);
     }

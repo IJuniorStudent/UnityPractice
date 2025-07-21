@@ -1,1 +1,3 @@
-public class Ground : RaycastTarget { }
+using UnityEngine;
+
+public class Ground : MonoBehaviour, IRaycastTarget { }

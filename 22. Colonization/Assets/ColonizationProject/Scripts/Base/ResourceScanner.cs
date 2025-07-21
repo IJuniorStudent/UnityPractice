@@ -18,9 +18,10 @@ public class ResourceScanner : MonoBehaviour
     
     private void Awake()
     {
-        Vector3 scale = gameObject.transform.localScale;
+        float halfDivisor = 2.0f;
+        Vector3 halfScale = gameObject.transform.localScale / halfDivisor;
         
-        _collectRadius = Mathf.Max(scale.x, scale.y, scale.z);
+        _collectRadius = Mathf.Max(halfScale.x, halfScale.y, halfScale.z);
         _collectWaitDelay = new WaitForSeconds(_collectDelay);
         _scanCache = new Collider[_scanMaxCapacity];
     }
@@ -55,15 +56,6 @@ public class ResourceScanner : MonoBehaviour
                 foundResources.Add(resource);
         
         if (foundResources.Count > 0)
-        {
-            Vector3 selfPosition = gameObject.transform.position;
-            
-            foundResources.Sort((resourceA, resourceB) =>
-                (selfPosition - resourceA.transform.position).sqrMagnitude.CompareTo(
-                    (selfPosition - resourceB.transform.position).sqrMagnitude)
-                );
-            
             ResourcesCollected?.Invoke(foundResources);
-        }
     }
 }
