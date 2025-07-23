@@ -9,19 +9,21 @@ public class ResourceBase : MonoBehaviour, ICollectorTarget, IRaycastTarget
     
     [SerializeField] private FlagCreator _flagCreator;
     [SerializeField] private UnitCreator _unitCreator;
+    [SerializeField] private UnitContainer _unitContainer;
     [SerializeField] private ResourceStorage _resourceStorage;
     [SerializeField] private ResourceScanner _resourceScanner;
     [SerializeField] private int _scanInterval = 3;
     [SerializeField] private int _unitCreateCost = 3;
     [SerializeField] private int _baseCreateCost = 5;
     
-    private ResourceCreator _resourceCreator;
+    private ResourceContainer _resourceContainer;
     private WaitForSeconds _scanDelay;
     private bool _isBaseCreateWait;
     
     public event Action<bool> SelectStateChanged;
     public event Action<ResourceBase, Unit, Vector3> UnitCreatedResourceBase;
     public event Action<int> UnitCountChanged;
+    public event Action<CollectableResource> ResourceStored;
     
     private void Awake()
     {
@@ -45,9 +47,9 @@ public class ResourceBase : MonoBehaviour, ICollectorTarget, IRaycastTarget
         _unitCreator.Created -= Link;
     }
     
-    public void Initialize(ResourceCreator resourceCreator, ResourceBaseFoundation flagPrefab)
+    public void Initialize(ResourceContainer resourceContainer, ResourceBaseFoundation flagPrefab)
     {
-        _resourceCreator = resourceCreator;
+        _resourceContainer = resourceContainer;
         _flagCreator.Initialize(flagPrefab);
     }
     
@@ -64,7 +66,7 @@ public class ResourceBase : MonoBehaviour, ICollectorTarget, IRaycastTarget
             return;
         }
         
-        if (_unitCreator.TotalCount < MinUnitsToCreateBase)
+        if (_unitContainer.TotalCount < MinUnitsToCreateBase)
             return;
         
         _flagCreator.Activate(position);
@@ -78,10 +80,10 @@ public class ResourceBase : MonoBehaviour, ICollectorTarget, IRaycastTarget
     
     public void Link(Unit unit)
     {
-        _unitCreator.Link(unit);
+        _unitContainer.Register(unit);
         _unitCreator.Relocate(unit);
         
-        UnitCountChanged?.Invoke(_unitCreator.TotalCount);
+        UnitCountChanged?.Invoke(_unitContainer.TotalCount);
         
         unit.ResourceDelivered += OnUnitDeliveredResource;
         unit.ResourceBaseCreated += OnUnitCreatedResourceBase;
@@ -94,8 +96,8 @@ public class ResourceBase : MonoBehaviour, ICollectorTarget, IRaycastTarget
         unit.ResourceDelivered -= OnUnitDeliveredResource;
         unit.ResourceBaseCreated -= OnUnitCreatedResourceBase;
         
-        _unitCreator.Unlink(unit);
-        UnitCountChanged?.Invoke(_unitCreator.TotalCount);
+        _unitContainer.Unregister(unit);
+        UnitCountChanged?.Invoke(_unitContainer.TotalCount);
     }
     
     private void TryCreateNewUnit()
@@ -106,18 +108,18 @@ public class ResourceBase : MonoBehaviour, ICollectorTarget, IRaycastTarget
     
     private void TryCreateNewBase()
     {
-        if (_unitCreator.FreeCount == 0)
+        if (_unitContainer.FreeCount == 0)
             return;
         
-        if (_unitCreator.TryGetFreeObject(out Unit unit) == false)
+        if (_unitContainer.TryGetFreeObject(out Unit unit) == false)
             return;
         
-        if (_unitCreator.TryReserve(unit) == false)
+        if (_unitContainer.TryReserve(unit) == false)
             return;
         
         if (_resourceStorage.TrySpend(_baseCreateCost) == false)
         {
-            _unitCreator.TryFree(unit);
+            _unitContainer.TryFree(unit);
             return;
         }
         
@@ -134,23 +136,20 @@ public class ResourceBase : MonoBehaviour, ICollectorTarget, IRaycastTarget
         }
     }
     
-    private void OnResourcesScanned(IReadOnlyList<CollectableResource> resources)
+    private void OnResourcesScanned(List<CollectableResource> resources)
     {
-        if (_unitCreator.FreeCount == 0)
+        _resourceContainer.TryRegister(resources, this);
+        
+        if (_resourceContainer.TryGetSorted(this, _unitContainer.FreeCount, out List<CollectableResource> sortedResources) == false)
             return;
         
-        List<CollectableResource> freeResources = _resourceCreator.FilterFreeSortedResources(resources, gameObject.transform.position);
-        int maxJobs = Math.Min(_unitCreator.FreeCount, freeResources.Count);
-        
-        for (int i = 0; i < maxJobs; i++)
+        foreach (CollectableResource resource in sortedResources)
         {
-            CollectableResource resource = freeResources[i];
-            
-            if (_unitCreator.TryGetFreeObject(out Unit unit) == false)
+            if (_unitContainer.TryGetFreeObject(out Unit unit) == false)
                 continue;
             
-            _unitCreator.TryReserve(unit);
-            _resourceCreator.TryReserve(resource);
+            _unitContainer.TryReserve(unit);
+            _resourceContainer.TryReserve(resource);
             
             resource.SetStateReserved();
             unit.CollectResource(resource);
@@ -162,9 +161,12 @@ public class ResourceBase : MonoBehaviour, ICollectorTarget, IRaycastTarget
         if (unit.TryDetachResource(out CollectableResource resource) == false)
             return;
         
+        _unitContainer.TryFree(unit);
         _resourceStorage.Store(resource.Value);
-        _resourceCreator.TryFree(resource);
-        _unitCreator.TryFree(unit);
+        _resourceContainer.TryFree(resource);
+        
+        resource.ResetState();
+        ResourceStored?.Invoke(resource);
         
         SelectNextJob();
     }

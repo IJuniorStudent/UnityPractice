@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class ResourceBaseCreator : MonoBehaviour
 {
-    [SerializeField] private ResourceCreator _resourceCreator;
+    [SerializeField] private ResourceSpawner _resourceSpawner;
+    [SerializeField] private ResourceContainer _resourceContainer;
     [SerializeField] private ResourceBase _resourceBasePrefab;
     [SerializeField] private ResourceBaseFoundation _flagPrefab;
     [SerializeField] private Transform[] _initialCreatePositions;
@@ -48,8 +49,9 @@ public class ResourceBaseCreator : MonoBehaviour
     private ResourceBase CreateBase(Vector3 position, Quaternion rotation)
     {
         ResourceBase resourceBase = Instantiate(_resourceBasePrefab, position, rotation);
-        resourceBase.Initialize(_resourceCreator, _flagPrefab);
+        resourceBase.Initialize(_resourceContainer, _flagPrefab);
         resourceBase.UnitCreatedResourceBase += OnUnitCreatedResourceBase;
+        resourceBase.ResourceStored += OnResourceStored;
         _bases.Add(resourceBase);
         
         return resourceBase;
@@ -61,5 +63,10 @@ public class ResourceBaseCreator : MonoBehaviour
         
         ResourceBase newBase = CreateBase(position, Quaternion.identity);
         newBase.Link(unit);
+    }
+    
+    private void OnResourceStored(CollectableResource resource)
+    {
+        _resourceSpawner.Despawn(resource);
     }
 }

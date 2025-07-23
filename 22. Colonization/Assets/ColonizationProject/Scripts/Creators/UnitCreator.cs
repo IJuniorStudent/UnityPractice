@@ -2,8 +2,11 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class UnitCreator : GenericCreator<Unit>
+public class UnitCreator : MonoBehaviour
 {
+    private const float MaxInitialRotationAngle = 360.0f;
+    
+    [SerializeField] private MultiBoxArea _spawnArea;
     [SerializeField] private Unit _prefab;
     
     public event Action<Unit> Created;
@@ -13,20 +16,10 @@ public class UnitCreator : GenericCreator<Unit>
         StartCoroutine(CreateUnits(count));
     }
     
-    public void Link(Unit unit)
-    {
-        Register(unit);
-    }
-    
-    public void Unlink(Unit unit)
-    {
-        Unregister(unit);
-    }
-    
     public void Relocate(Unit unit)
     {
         Transform unitTransform = unit.transform;
-        unitTransform.position = SpawnArea.GetRandomPoint();
+        unitTransform.position = _spawnArea.GetRandomPoint();
         unitTransform.rotation = Quaternion.Euler(0, UnityEngine.Random.value * MaxInitialRotationAngle, 0);
     }
     
@@ -42,9 +35,6 @@ public class UnitCreator : GenericCreator<Unit>
     private void CreateUnit()
     {
         Unit newUnit = Instantiate(_prefab);
-        
-        Register(newUnit);
-        
         Created?.Invoke(newUnit);
     }
 }

@@ -439,7 +439,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0256d678d9ffee44289ad12cb6e3b066, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _resourceCreator: {fileID: 2088103429}
+  _resourceSpawner: {fileID: 2088103430}
+  _resourceContainer: {fileID: 2088103431}
   _resourceBasePrefab: {fileID: 6344455003018421790, guid: dc2f0e572555ecb4c88761fc0e7719cb, type: 3}
   _flagPrefab: {fileID: 1021647317639899843, guid: 15783c5ec98597540853a4615ab3c91e, type: 3}
   _initialCreatePositions:
@@ -824,6 +825,7 @@ GameObject:
   - component: {fileID: 2088103428}
   - component: {fileID: 2088103430}
   - component: {fileID: 2088103429}
+  - component: {fileID: 2088103431}
   m_Layer: 0
   m_Name: ResourceSpawner
   m_TagString: Untagged
@@ -873,7 +875,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: befabfdd98453a441ba5b2b5d7a227b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpawnArea: {fileID: 2088103428}
+  _spawnArea: {fileID: 2088103428}
   _spawner: {fileID: 2088103430}
   _spawnInterval: 5
   _resourcesCountPerSpawn: 3
@@ -892,6 +894,18 @@ MonoBehaviour:
   _poolCapacity: 10
   _poolMaxSize: 100
   _prefab: {fileID: 6449345280114259152, guid: 4845db9d23d777049b454738eb4f00a7, type: 3}
+--- !u!114 &2088103431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2088103426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53c12faf297c17a47adf0551a13938b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1669559758280015572
 PrefabInstance:
   m_ObjectHideFlags: 0

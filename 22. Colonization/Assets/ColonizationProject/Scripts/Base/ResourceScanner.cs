@@ -14,7 +14,7 @@ public class ResourceScanner : MonoBehaviour
     private float _collectRadius;
     private Collider[] _scanCache;
     
-    public event Action<IReadOnlyList<CollectableResource>> ResourcesCollected;
+    public event Action<List<CollectableResource>> ResourcesCollected;
     
     private void Awake()
     {

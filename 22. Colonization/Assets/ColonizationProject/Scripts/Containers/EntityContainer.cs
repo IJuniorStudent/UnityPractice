@@ -1,22 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GenericCreator<T> : MonoBehaviour where T : MonoBehaviour
+public class EntityContainer<T> : MonoBehaviour where T : MonoBehaviour
 {
-    protected const float MaxInitialRotationAngle = 360.0f;
-    
-    [SerializeField] protected MultiBoxArea SpawnArea;
-    
     private HashSet<T> _freeObjects = new();
     private HashSet<T> _reservedObjects = new();
     
     public int FreeCount => _freeObjects.Count;
     public int TotalCount => _freeObjects.Count + _reservedObjects.Count;
-    
-    public bool IsFree(T instance)
-    {
-        return _freeObjects.Contains(instance);
-    }
     
     public bool TryGetFreeObject(out T freeObject)
     {
@@ -52,15 +43,25 @@ public class GenericCreator<T> : MonoBehaviour where T : MonoBehaviour
         return true;
     }
     
-    protected void Register(T instance)
+    public void Register(T instance)
     {
         Unregister(instance);
         _freeObjects.Add(instance);
     }
     
-    protected void Unregister(T instance)
+    public void Unregister(T instance)
     {
         if (_freeObjects.Remove(instance) == false)
             _reservedObjects.Remove(instance);
+    }
+    
+    protected bool IsFree(T instance)
+    {
+        return _freeObjects.Contains(instance);
+    }
+    
+    protected bool Has(T instance)
+    {
+        return _freeObjects.Contains(instance) || _reservedObjects.Contains(instance);
     }
 }
